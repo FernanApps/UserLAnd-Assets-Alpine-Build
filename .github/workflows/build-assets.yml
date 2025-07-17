@@ -51,6 +51,7 @@ jobs:
       - name: Organize artifacts
         run: |
           tree temp-artifacts/
+          mkdir -p output/release/ 
           for arch in arm arm64 x86 x86_64; do
             mkdir -p release/$arch
             mv temp-artifacts/${arch}-release/* output/release/ || true
