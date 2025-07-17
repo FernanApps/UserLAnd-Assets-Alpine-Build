@@ -6,3 +6,4 @@ services:
        args:
          IMAGE_ARCH: arm32v7
          QEMU_FILE: qemu-arm-static
+       platform: linux/arm/v7  
