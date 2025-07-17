@@ -18,7 +18,10 @@ jobs:
 
       - name: Install dependencies (only for arm/arm64)
         if: matrix.arch == 'arm' || matrix.arch == 'arm64'
-        run: sudo apt-get update && sudo apt-get install -y binfmt-support qemu qemu-user-static
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y binfmt-support qemu-user-static qemu-system-arm qemu-system-x86
+
 
       - name: Build assets for ${{ matrix.arch }}
         run: ./buildArch.sh ${{ matrix.arch }}
