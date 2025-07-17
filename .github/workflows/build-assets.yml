@@ -1,0 +1,65 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*.*.*'  
+
+jobs:
+  build_assets:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [arm, arm64, x86, x86_64]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies (only for arm/arm64)
+        if: matrix.arch == 'arm' || matrix.arch == 'arm64'
+        run: sudo apt-get update && sudo apt-get install -y binfmt-support qemu qemu-user-static
+
+      - name: Build assets for ${{ matrix.arch }}
+        run: ./buildArch.sh ${{ matrix.arch }}
+
+      - name: Upload ${{ matrix.arch }} artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.arch }}-release
+          path: release/*
+
+  release:
+    needs: build_assets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: temp-artifacts
+
+      - name: Organize artifacts
+        run: |
+          tree temp-artifacts/
+          for arch in arm arm64 x86 x86_64; do
+            mkdir -p release/$arch
+            mv temp-artifacts/${arch}-release/* release/$arch/ || true
+          done
+
+      - name: Publish Release on GitHub
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          go install github.com/tcnksm/ghr@latest
+          VERSION=$(date +release-%Y-%m-%d)
+          echo "Publishing release: $VERSION"
+          ghr -t ${GITHUB_TOKEN} \
+              -u ${{ github.repository_owner }} \
+              -r ${{ github.event.repository.name }} \
+              -c ${{ github.sha }} \
+              -delete \
+              -prerelease \
+              "$VERSION" output/release/
+
