@@ -24,7 +24,7 @@ jobs:
 
 
       - name: Build assets for ${{ matrix.arch }}
-        run: ./buildArch.sh ${{ matrix.arch }}
+        run: ./buildArch.sh ${{ matrix.arch }} && tree .
 
       - name: Upload ${{ matrix.arch }} artifact
         uses: actions/upload-artifact@v4
