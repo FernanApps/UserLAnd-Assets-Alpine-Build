@@ -71,4 +71,3 @@ jobs:
               -delete \
               -prerelease \
               "$VERSION" output/release/
-
