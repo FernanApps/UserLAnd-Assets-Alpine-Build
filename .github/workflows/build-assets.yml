@@ -16,6 +16,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Docker
+        run: |
+          curl -fsSL https://get.docker.com -o get-docker.sh
+          sh get-docker.sh
+          
+      - name: Add docker-compose shim for compatibility
+        run: |
+          echo -e '#!/bin/bash\ndocker compose "$@"' | sudo tee /usr/local/bin/docker-compose > /dev/null
+          sudo chmod +x /usr/local/bin/docker-compose
+
       - name: Install dependencies (only for arm/arm64)
         if: matrix.arch == 'arm' || matrix.arch == 'arm64'
         run: |
