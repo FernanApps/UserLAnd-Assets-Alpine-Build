@@ -7,7 +7,11 @@ services:
        dockerfile: Dockerfile
        args:
          IMAGE_DISTRO: alpine
-         IMAGE_VERSION: 3.22.1 
+         IMAGE_VERSION: 3.15.0
      volumes:
        - ./output:/output
        - ./input:/input
+
+
+
+
